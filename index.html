@@ -1,0 +1,892 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <title>言语 ☁️ 智能 - 公益学习平台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Remix Icon 图标库 -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Tailwind 自定义主题（与原来的颜色体系保持一致） -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sky: { 50: '#F0F9FF', 100: '#E0F2FE' },
+            macaron: {
+              purple: '#F3E5F5',
+              yellow: '#FFF9C4',
+              green: '#E8F5E9',
+              pink: '#FCE4EC',
+              blue: '#E3F2FD',
+              orange: '#FFE0B2'
+            },
+            warm: {
+              orange: '#FFB74D',
+              dark: '#37474F'
+            }
+          },
+          fontFamily: {
+            sans: ['"PingFang SC"', '"Microsoft YaHei"', '"Nunito"', 'sans-serif'],
+            rounded: ['"YouYuan"', '"Varela Round"', 'sans-serif']
+          },
+          boxShadow: {
+            soft: '0 10px 25px -5px rgba(148, 163, 184, 0.15)',
+            glow: '0 0 15px rgba(255, 183, 77, 0.4)'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- 自定义样式文件 -->
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden relative bg-sky-100 text-warm-dark selection:bg-orange-200 selection:text-orange-900">
+
+  <!-- ========== 页面 Header（每个“页面”一个，对应 data-page） ========== -->
+
+  <!-- 首页 Header：时间 / 日期 / 天气 + 3 个功能入口 -->
+  <header data-page="home" class="page-header w-full px-8 py-4 flex items-center justify-between z-20">
+    <div class="flex items-center gap-6">
+      <div class="text-right">
+        <div id="clock" class="text-3xl font-bold text-slate-700 font-rounded tracking-widest">
+          08:30
+        </div>
+        <div id="date" class="text-sm text-slate-500 font-medium">
+          11月24日 星期五
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-2xl backdrop-blur-sm">
+        <i class="ri-sun-fill text-yellow-400 text-2xl"></i>
+        <span class="text-lg font-bold text-slate-600">23°C</span>
+        <span class="text-xs text-slate-400">适宜户外</span>
+      </div>
+    </div>
+
+    <div class="flex gap-4">
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-blue-50 transition cursor-pointer text-slate-600" onclick="switchPage('growth')">
+        <i class="ri-calendar-check-fill text-blue-400"></i>
+        <span class="text-sm font-bold">学习打卡</span>
+      </button>
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-red-50 transition cursor-pointer text-slate-600" onclick="switchPage('activities')">
+        <i class="ri-heart-3-fill text-red-400"></i>
+        <span class="text-sm font-bold">公益活动</span>
+      </button>
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-yellow-50 transition cursor-pointer text-slate-600" onclick="switchPage('settings')">
+        <i class="ri-parent-fill text-yellow-500"></i>
+        <span class="text-sm font-bold">家长须知</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 作业 Header -->
+  <header data-page="homework" class="page-header w-full px-8 py-4 flex items-center justify-between z-20 hidden">
+    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+      <i class="ri-book-open-fill text-blue-500"></i>
+      我的作业任务
+    </h1>
+    <div class="flex gap-4">
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-blue-50 transition text-slate-600">
+        <i class="ri-filter-2-line text-lg"></i>
+        <span class="text-sm font-bold">按学科筛选</span>
+      </button>
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-blue-50 transition text-slate-600">
+        <i class="ri-sort-asc text-lg"></i>
+        <span class="text-sm font-bold">按截止日期排序</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 课程 Header -->
+  <header data-page="courses" class="page-header w-full px-8 py-4 flex items-center justify-between z-20 hidden">
+    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+      <i class="ri-macbook-fill text-blue-500"></i>
+      我的公益课程
+    </h1>
+    <div class="relative w-1/3 max-w-xs hidden md:block">
+      <input type="text" id="course-search" placeholder="搜索你想学的课程..." class="w-full py-3 pl-12 pr-4 rounded-full border-2 border-blue-100 focus:border-blue-300 transition shadow-sm outline-none text-slate-600 placeholder:text-slate-400 bg-white">
+      <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+    </div>
+  </header>
+
+  <!-- 公益活动 Header -->
+  <header data-page="activities" class="page-header w-full px-8 py-4 flex items-center justify-between z-20 hidden">
+    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+      <i class="ri-heart-2-fill text-red-400"></i>
+      公益活动中心
+    </h1>
+    <div class="flex gap-4">
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-red-50 transition text-red-500">
+        <i class="ri-user-heart-fill text-lg"></i>
+        <span class="text-sm font-bold">我的参与</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 消息 Header -->
+  <header data-page="messages" class="page-header w-full px-8 py-4 flex items-center justify-between z-20 hidden">
+    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+      <i class="ri-message-3-fill text-blue-500"></i>
+      消息中心
+    </h1>
+    <div class="flex gap-4">
+      <button class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-blue-50 transition text-slate-600">
+        <i class="ri-mail-open-line text-lg"></i>
+        <span class="text-sm font-bold">全部标为已读</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 成长 Header -->
+  <header data-page="growth" class="page-header w-full px-8 py-4 flex items-center justify-between z-20 hidden">
+    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+      <i class="ri-trophy-fill text-yellow-500"></i>
+      我的成长记录
+    </h1>
+    <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm">
+      <div class="w-10 h-10 bg-pink-300 rounded-full flex items-center justify-center text-white font-bold text-lg">
+        👩🏻
+      </div>
+      <span class="text-lg font-bold">☁️</span>
+    </div>
+  </header>
+
+  <!-- 设置 Header -->
+  <header data-page="settings" class="page-header w-full px-8 py-4 flex items-center justify-between z-20 hidden">
+    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+      <i class="ri-settings-4-fill text-slate-500"></i>
+      设置与管理
+    </h1>
+  </header>
+
+  <!-- ========== 主内容区域（单个 <main>，内部多个 section data-page） ========== -->
+  <main class="flex-1 overflow-y-auto w-full">
+    <!-- ========= 首页：左 Q 版小人 + 柴犬 / 右侧 今日计划 + 作业中心 + 3 功能卡 ========= -->
+    <section data-page="home" class="page-section max-w-7xl mx-auto w-full px-8 pb-28 pt-2 grid grid-cols-12 gap-8">
+      <!-- 左侧角色区 -->
+      <section class="col-span-12 md:col-span-4 flex flex-col justify-between items-center relative h-full">
+        <div class="bg-white px-6 py-4 rounded-3xl rounded-bl-none shadow-soft mb-4 border-2 border-blue-100 animate-bounce" style="animation-duration: 3s;">
+          <p class="text-lg font-bold text-slate-700">
+            Hi, 小朋友！今天也一起加油吧！✨
+          </p>
+        </div>
+
+        <div class="relative w-full flex-grow flex items-center justify-center max-h-[50vh]">
+          <div class="w-full h-full relative">
+            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/d8b940bc6b0041be97f338c7685d7741~tplv-a9rns2rl98-image.image?rcl=2025112122150088900C1BBD9ED5A8735F&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1764339301&amp;x-signature=QOEcLC%2BZl8azmtFHns3rp1ihyzc%3D" alt="3D卡通男孩形象" class="w-full h-full object-contain">
+            <div class="absolute bottom-10 right-10 text-6xl wag-tail cursor-pointer" title="摸摸头">
+              🐕
+            </div>
+          </div>
+          <div class="absolute bottom-10 w-3/4 h-12 bg-green-200/50 rounded-[50%] -z-10 blur-md"></div>
+        </div>
+
+        <div class="mt-4 text-center">
+          <h2 class="text-2xl font-rounded font-bold text-slate-700">快乐学习助手</h2>
+          <p class="text-slate-500 mt-1">公益 · 陪伴 · 成长</p>
+        </div>
+      </section>
+
+      <!-- 右侧功能区 -->
+      <section class="col-span-12 md:col-span-8 flex flex-col gap-6 justify-center h-full">
+        <!-- 今日计划卡片 -->
+        <div class="bg-macaron-yellow w-full p-6 rounded-3xl shadow-sm flex flex-col gap-3 relative overflow-hidden">
+          <i class="ri-todo-fill absolute -right-4 -top-4 text-9xl text-yellow-400/20"></i>
+
+          <div class="flex items-center gap-2 z-10">
+            <div class="bg-yellow-400 text-white p-1.5 rounded-lg">
+              <i class="ri-list-check"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-700">今日计划</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 z-10">
+            <!-- 计划 1 -->
+            <div class="daily-plan-item flex items-center gap-3 bg-white/60 p-3 rounded-xl cursor-pointer hover:bg-white transition" data-plan-id="plan-1" data-plan-default="pending">
+              <div class="daily-plan-check w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center text-xs">
+                <i class="ri-check-line"></i>
+              </div>
+              <span class="daily-plan-text text-slate-700 font-medium">
+                背诵古诗《静夜思》
+              </span>
+            </div>
+
+            <!-- 计划 2 -->
+            <div class="daily-plan-item flex items-center gap-3 bg-white/60 p-3 rounded-xl cursor-pointer hover:bg-white transition" data-plan-id="plan-2" data-plan-default="done">
+              <div class="daily-plan-check w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center text-xs">
+                <i class="ri-check-line"></i>
+              </div>
+              <span class="daily-plan-text text-slate-700 font-medium">
+                完成 10 道口算题
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 作业中心 + 开始作业按钮 -->
+        <div class="bg-white w-full p-6 md:p-8 rounded-3xl shadow-soft border-2 border-blue-50 flex flex-col md:flex-row items-center justify-between relative float-anim gap-6">
+          <div class="flex flex-col gap-2">
+            <h2 class="text-3xl font-rounded font-extrabold text-slate-800 flex items-center gap-2">
+              🌈 作业中心
+            </h2>
+            <p class="text-slate-500">保持专注，你最棒啦！</p>
+            <div class="mt-2 flex gap-2">
+              <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-md">语文</span>
+              <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-md">数学</span>
+            </div>
+          </div>
+
+          <button class="group relative bg-gradient-to-r from-orange-300 to-orange-400 hover:from-orange-400 hover:to-orange-500 text-white px-8 md:px-10 py-4 md:py-5 rounded-full shadow-glow transition-all transform hover:scale-105 active:scale-95 flex items-center gap-3" onclick="switchPage('homework')">
+            <span class="text-xl md:text-2xl font-bold tracking-wide">
+              开始作业
+            </span>
+            <i class="ri-arrow-right-circle-fill text-2xl md:text-3xl opacity-80 group-hover:translate-x-1 transition-transform"></i>
+          </button>
+        </div>
+
+        <!-- 三个小功能卡片 -->
+        <div class="grid grid-cols-3 gap-4 md:gap-6">
+          <button class="bg-macaron-purple p-4 md:p-5 rounded-3xl shadow-sm hover:shadow-md transition cursor-pointer flex flex-col items-center gap-2 group">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition">
+              <i class="ri-eraser-fill text-purple-400 text-2xl"></i>
+            </div>
+            <span class="font-bold text-slate-700 text-sm md:text-base">
+              错题本
+            </span>
+          </button>
+
+          <button class="bg-macaron-blue p-4 md:p-5 rounded-3xl shadow-sm hover:shadow-md transition cursor-pointer flex flex-col items-center gap-2 group" onclick="switchPage('courses')">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition">
+              <i class="ri-video-chat-fill text-blue-400 text-2xl"></i>
+            </div>
+            <span class="font-bold text-slate-700 text-sm md:text-base">
+              公益课堂
+            </span>
+          </button>
+
+          <button class="bg-macaron-pink p-4 md:p-5 rounded-3xl shadow-sm hover:shadow-md transition cursor-pointer flex flex-col items-center gap-2 group">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition">
+              <i class="ri-emotion-happy-fill text-pink-400 text-2xl"></i>
+            </div>
+            <span class="font-bold text-slate-700 text-sm md:text-base">
+              心情记录
+            </span>
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <!-- ========= 作业页面 ========= -->
+    <section data-page="homework" class="page-section hidden max-w-7xl mx-auto w-full px-8 pb-28 pt-4">
+      <!-- 状态 Tab -->
+      <div class="w-full bg-blue-100/50 p-1.5 rounded-full flex gap-1 mb-6 max-w-lg mx-auto">
+          <button class="flex-1 py-2 rounded-full text-slate-600 tab-active" data-homework-filter="pending">
+            待完成
+          </button>
+          <button class="flex-1 py-2 rounded-full text-slate-600 hover:bg-white" data-homework-filter="done">
+            已完成
+          </button>
+          <button class="flex-1 py-2 rounded-full text-slate-600 hover:bg-white" data-homework-filter="review">
+            待批改
+          </button>
+        </div>
+
+        <section id="homework-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- 作业卡片由 JS 动态生成 -->
+        </section>
+    </section>
+
+    <!-- ========= 课程页面 ========= -->
+    <section data-page="courses" class="page-section hidden max-w-7xl mx-auto w-full px-8 pb-28 pt-4">
+      <!-- 分类按钮 -->
+      <section class="mb-6 flex overflow-x-auto hide-scrollbar gap-3 pb-2 items-center">
+        <h3 class="text-xl font-bold text-slate-700 whitespace-nowrap pr-3">
+          🔍 分类:
+        </h3>
+
+        <button class="bg-blue-400 text-white font-bold px-5 py-2 rounded-full shadow-md transition-all whitespace-nowrap active:scale-95" data-course-filter="all">
+          全部课程
+        </button>
+
+        <button class="bg-macaron-yellow text-yellow-800 font-bold px-5 py-2 rounded-full hover:bg-yellow-200 transition-all whitespace-nowrap" data-course-filter="语文">
+          📚 语文
+        </button>
+        <button class="bg-macaron-green text-green-800 font-bold px-5 py-2 rounded-full hover:bg-green-200 transition-all whitespace-nowrap" data-course-filter="数学">
+          📐 数学
+        </button>
+        <button class="bg-macaron-purple text-purple-800 font-bold px-5 py-2 rounded-full hover:bg-purple-200 transition-all whitespace-nowrap" data-course-filter="科学">
+          🌏 科学
+        </button>
+        <button class="bg-macaron-pink text-pink-800 font-bold px-5 py-2 rounded-full hover:bg-pink-200 transition-all whitespace-nowrap" data-course-filter="艺术">
+          🎨 艺术
+        </button>
+        <button class="bg-white text-slate-600 font-bold px-5 py-2 rounded-full hover:bg-slate-100 transition-all whitespace-nowrap" data-course-filter="素质拓展">
+          🌟 素质拓展
+        </button>
+      </section>
+
+      <!-- 课程列表 -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 课 1 -->
+        <article class="bg-white rounded-3xl p-6 shadow-soft hover:shadow-lg transition-all cursor-pointer border-2 border-green-200 flex flex-col gap-4" data-course-category="语文">
+          <div class="flex items-center justify-between">
+            <span class="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full">
+              进行中
+            </span>
+            <i class="ri-bookmark-fill text-yellow-500 text-xl"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-1">《小学古诗词鉴赏 (上)》</h4>
+            <p class="text-slate-500 text-sm">
+              掌握 50 首必背古诗，理解诗歌意境。
+            </p>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium mb-1 flex justify-between">
+              <span>进度: 75%</span>
+              <span class="text-green-600">已学 6/8 单元</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2.5">
+              <div class="bg-green-500 h-2.5 rounded-full" style="width: 75%"></div>
+            </div>
+          </div>
+
+          <button class="w-full bg-green-400 text-white py-2 rounded-full font-bold hover:bg-green-500 transition">
+            继续学习
+          </button>
+        </article>
+
+        <!-- 课 2 -->
+        <article class="bg-macaron-purple rounded-3xl p-6 shadow-soft hover:shadow-lg transition-all cursor-pointer flex flex-col gap-4" data-course-category="科学">
+          <div class="flex items-center justify-between">
+            <span class="bg-purple-100 text-purple-700 text-sm font-bold px-3 py-1 rounded-full">
+              新课上线
+            </span>
+            <i class="ri-bookmark-line text-slate-300 text-xl"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-1">《趣味科学实验课》</h4>
+            <p class="text-slate-600 text-sm">
+              探索 10 个居家小实验，激发科学兴趣。
+            </p>
+          </div>
+
+          <div class="text-sm font-medium text-slate-600">
+            <i class="ri-time-line text-lg mr-1"></i> 共 4 课时
+          </div>
+
+          <button class="w-full bg-purple-400 text-white py-2 rounded-full font-bold hover:bg-purple-500 transition">
+            立即开始
+          </button>
+        </article>
+
+        <!-- 课 3 -->
+       <article class="bg-macaron-yellow rounded-3xl p-6 shadow-soft hover:shadow-lg transition-all cursor-pointer flex flex-col gap-4" data-course-category="素质拓展">
+          <div class="flex items-center justify-between">
+            <span class="bg-yellow-100 text-yellow-700 text-sm font-bold px-3 py-1 rounded-full">
+              难度：中
+            </span>
+            <i class="ri-bookmark-line text-slate-300 text-xl"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-1">《初级编程思维训练》</h4>
+            <p class="text-slate-600 text-sm">
+              通过简单拖拽，学习编程逻辑和流程控制。
+            </p>
+          </div>
+
+          <div class="text-sm font-medium text-slate-600">
+            <i class="ri-user-smile-line text-lg mr-1"></i> 适合 8 岁以上
+          </div>
+
+          <button class="w-full bg-warm-orange text-white py-2 rounded-full font-bold hover:bg-orange-500 transition">
+            查看详情
+          </button>
+        </article>
+      </section>
+    </section>
+
+    <!-- ========= 公益活动页面 ========= -->
+    <section data-page="activities" class="page-section hidden max-w-7xl mx-auto w-full px-8 pb-28 pt-4">
+      <!-- tab -->
+      <div class="w-full bg-blue-100/50 p-1.5 rounded-full flex gap-1 mb-8 max-w-lg mx-auto">
+        <button class="flex-1 py-2 rounded-full text-slate-600 tab-active-activities" data-activity-tab="ongoing">
+          💚 正在进行 (2)
+        </button>
+        <button class="flex-1 py-2 rounded-full text-slate-600 hover:bg-white transition" data-activity-tab="history">
+          📚 历史回顾 (5)
+        </button>
+      </div>
+      <section id="activities-ongoing" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- 活动卡 1 -->
+          <article class="bg-macaron-green rounded-3xl p-4 shadow-soft hover:shadow-lg transition-all cursor-pointer flex flex-col gap-4">
+            <div class="h-40 bg-gradient-to-r from-green-300 to-green-200 rounded-2xl flex items-center justify-center relative overflow-hidden">
+              <i class="ri-plant-line absolute left-4 bottom-4 text-8xl md:text-9xl text-white/50"></i>
+              <span class="text-xl font-bold text-green-800 z-10">
+                🌍 认领一颗小树苗
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              <h4 class="text-2xl font-bold text-slate-800">
+                “我的绿色小星球” 线上种植活动
+              </h4>
+              <p class="text-slate-600 text-sm">
+                通过线上工具，模拟种植一棵树，学习环保知识。每完成一步，
+                平台将捐赠一笔环保基金。
+              </p>
+            </div>
+
+            <div class="flex justify-between items-center text-sm font-medium mb-2">
+              <span class="text-green-600 flex items-center gap-1">
+                <i class="ri-group-line"></i>
+                已有 1,200 名同学参与
+              </span>
+              <span class="text-red-500 flex items-center gap-1">
+                <i class="ri-time-line"></i>
+                仅剩 5 天
+              </span>
+            </div>
+
+            <button class="w-full bg-green-500 text-white py-3 rounded-full font-extrabold text-lg hover:bg-green-600 transition shadow-md active:scale-95">
+              立即报名并开始
+            </button>
+          </article>
+
+          <!-- 活动卡 2 -->
+          <article class="bg-macaron-blue rounded-3xl p-4 shadow-soft hover:shadow-lg transition-all cursor-pointer flex flex-col gap-4">
+            <div class="h-40 bg-gradient-to-r from-blue-300 to-blue-200 rounded-2xl flex items-center justify-center relative overflow-hidden">
+              <i class="ri-book-read-fill absolute right-4 bottom-4 text-8xl md:text-9xl text-white/50"></i>
+              <span class="text-xl font-bold text-blue-800 z-10">
+                📖 故事伴读计划
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              <h4 class="text-2xl font-bold text-slate-800">
+                为乡村小朋友录制睡前故事
+              </h4>
+              <p class="text-slate-600 text-sm">
+                同学们可以录制自己的声音，为偏远地区的儿童送去温暖的睡前故事。
+                让你的声音成为陪伴。
+              </p>
+            </div>
+
+            <div class="flex justify-between items-center text-sm font-medium mb-2">
+              <span class="text-blue-600 flex items-center gap-1">
+                <i class="ri-group-line"></i>
+                已有 580 份音频完成
+              </span>
+              <span class="text-blue-500 flex items-center gap-1">
+                <i class="ri-time-line"></i>
+                持续招募中
+              </span>
+            </div>
+
+            <button class="w-full bg-blue-400 text-white py-3 rounded-full font-extrabold text-lg hover:bg-blue-500 transition shadow-md active:scale-95">
+              查看详情并录制
+            </button>
+          </article>
+        </section>
+        <section id="activities-history" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+          <!-- 示例历史活动 -->
+          <article class="bg-white rounded-3xl p-4 shadow-soft hover:shadow-lg transition-all cursor-pointer flex flex-col gap-3">
+            <h4 class="text-lg font-bold text-slate-800">
+              2024 春季图书捐赠计划
+            </h4>
+            <p class="text-sm text-slate-500">
+              已为 6 所乡村学校送出 1200 本图书。
+            </p>
+            <span class="text-xs text-slate-400">已结束 · 2024-05</span>
+          </article>
+
+          <article class="bg-white rounded-3xl p-4 shadow-soft hover:shadow-lg transition-all cursor-pointer flex flex-col gap-3">
+            <h4 class="text-lg font-bold text-slate-800">
+              “给地球写封信” 环保征文
+            </h4>
+            <p class="text-sm text-slate-500">
+              收到 300+ 篇小朋友作品，评选出 30 篇优秀来信。
+            </p>
+            <span class="text-xs text-slate-400">已结束 · 2024-09</span>
+          </article>
+        </section>
+      </section>
+    </section>
+
+    <!-- ========= 消息页面 ========= -->
+    <section data-page="messages" class="page-section hidden max-w-4xl mx-auto w-full px-8 pb-28 pt-4">
+      <!-- 作业反馈 -->
+      <section class="mb-8">
+        <h2 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <i class="ri-medal-fill text-yellow-500"></i>
+          作业反馈 (2 条未读)
+        </h2>
+
+        <div class="space-y-4">
+          <!-- 作业反馈 未读 -->
+          <article class="bg-macaron-yellow rounded-3xl p-5 shadow-soft hover:shadow-lg transition-all cursor-pointer flex items-start gap-4 unread-bg border-l-4 border-yellow-400" data-message-id="msg-hw-1">
+            <i class="ri-check-double-fill text-yellow-500 text-3xl mt-1"></i>
+            <div class="flex-1">
+              <h4 class="text-lg font-bold">
+                语文作业 [古诗词背诵] 已批改！
+              </h4>
+              <p class="text-slate-600 text-sm mt-1">
+                本次作业完成度高，老师点赞你的朗读表现！
+              </p>
+            </div>
+            <span class="text-xs text-slate-500 mt-1 flex items-center gap-1 whitespace-nowrap">
+              <i class="ri-time-line"></i> 10分钟前
+            </span>
+          </article>
+
+          <!-- 作业反馈 已读 -->
+          <article class="bg-white rounded-3xl p-5 shadow-soft hover:shadow-lg transition-all cursor-pointer flex items-start gap-4 opacity-80" data-message-id="msg-hw-2">
+            <i class="ri-edit-2-fill text-blue-400 text-3xl mt-1"></i>
+            <div class="flex-1">
+              <h4 class="text-lg font-bold">数学作业 [口算题] 待完善</h4>
+              <p class="text-slate-500 text-sm mt-1">
+                有 2 题计算错误，请在错题本中查看并重做。
+              </p>
+            </div>
+            <span class="text-xs text-slate-500 mt-1 flex items-center gap-1 whitespace-nowrap">
+              <i class="ri-time-line"></i> 昨天
+            </span>
+          </article>
+        </div>
+      </section>
+
+      <!-- 系统通知 -->
+      <section class="mb-8">
+        <h2 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <i class="ri-notification-3-fill text-purple-500"></i>
+          系统通知 (1 条未读)
+        </h2>
+
+        <div class="space-y-4">
+          <!-- 系统通知 未读 -->
+          <article class="bg-macaron-purple rounded-3xl p-5 shadow-soft hover:shadow-lg transition-all cursor-pointer flex items-start gap-4 unread-bg border-l-4 border-purple-400" data-message-id="msg-sys-1">
+            <i class="ri-sun-fill text-purple-500 text-3xl mt-1"></i>
+            <div class="flex-1">
+              <h4 class="text-lg font-bold">
+                学习提醒：今天是你学习天数第 30 天！
+              </h4>
+              <p class="text-slate-600 text-sm mt-1">
+                恭喜你达成成就！保持习惯，继续加油！
+              </p>
+            </div>
+            <span class="text-xs text-slate-500 mt-1 flex items-center gap-1 whitespace-nowrap">
+              <i class="ri-time-line"></i> 1小时前
+            </span>
+          </article>
+        </div>
+      </section>
+
+      <!-- 活动通知 -->
+      <section>
+        <h2 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <i class="ri-plant-fill text-green-500"></i>
+          活动通知 (0 条未读)
+        </h2>
+
+        <div class="space-y-4">
+          <!-- 活动通知（默认已读） -->
+          <article class="bg-white rounded-3xl p-5 shadow-soft hover:shadow-lg transition-all cursor-pointer flex items-start gap-4 opacity-80" data-message-id="msg-act-1">
+            <i class="ri-group-fill text-green-400 text-3xl mt-1"></i>
+            <div class="flex-1">
+              <h4 class="text-lg font-bold">
+                公益活动：故事伴读计划已成功启动！
+              </h4>
+              <p class="text-slate-500 text-sm mt-1">
+                感谢你的参与，你的录音已成功被采纳！
+              </p>
+            </div>
+            <span class="text-xs text-slate-500 mt-1 flex items-center gap-1 whitespace-nowrap">
+              <i class="ri-time-line"></i> 3天前
+            </span>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <!-- ========= 成长记录页面 ========= -->
+    <section data-page="growth" class="page-section hidden max-w-7xl mx-auto w-full px-8 pb-28 pt-4">
+      <!-- 上方四块概览 -->
+      <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-macaron-yellow p-6 rounded-3xl shadow-soft flex flex-col items-center">
+          <i class="ri-calendar-check-fill text-yellow-500 text-4xl mb-2"></i>
+          <div class="text-4xl font-extrabold text-slate-800">128</div>
+          <p class="text-slate-600 mt-1">累计学习天数</p>
+        </div>
+
+        <div class="bg-macaron-green p-6 rounded-3xl shadow-soft flex flex-col items-center">
+          <i class="ri-bar-chart-fill text-green-500 text-4xl mb-2"></i>
+          <div class="text-4xl font-extrabold text-slate-800">
+            92<span class="text-xl">%</span>
+          </div>
+          <p class="text-slate-600 mt-1">平均作业准确率</p>
+        </div>
+
+        <div class="bg-macaron-purple p-6 rounded-3xl shadow-soft flex flex-col items-center">
+          <i class="ri-star-fill text-purple-500 text-4xl mb-2"></i>
+          <div class="text-4xl font-extrabold text-slate-800">8</div>
+          <p class="text-slate-600 mt-1">已解锁徽章</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-soft">
+          <h4 class="text-lg font-bold mb-2">本周专注时长</h4>
+          <div class="h-20 bg-blue-50 rounded-lg p-2 flex gap-1 items-end overflow-hidden">
+            <div class="w-1/6 bg-blue-300 h-1/2 rounded-t-full"></div>
+            <div class="w-1/6 bg-blue-300 h-3/4 rounded-t-full"></div>
+            <div class="w-1/6 bg-blue-500 h-5/6 rounded-t-full"></div>
+            <div class="w-1/6 bg-blue-300 h-2/3 rounded-t-full"></div>
+            <div class="w-1/6 bg-blue-300 h-1/3 rounded-t-full"></div>
+            <div class="w-1/6 bg-blue-300 h-2/5 rounded-t-full"></div>
+          </div>
+          <p class="text-sm text-slate-500 mt-2 text-center">总计 4.5 小时</p>
+        </div>
+      </section>
+
+      <!-- 成就徽章 -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-slate-800 mb-5 flex items-center gap-2">
+          <i class="ri-award-fill text-yellow-500"></i>
+          成就徽章墙
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <div class="flex flex-col items-center p-3 rounded-xl badge-unlocked bg-macaron-yellow border-2 border-yellow-300">
+            <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-4xl text-white shadow-md">
+              🥇
+            </div>
+            <p class="text-sm font-bold text-slate-700 mt-2 text-center">
+              专注小能手
+            </p>
+            <p class="text-xs text-slate-500">已获得</p>
+          </div>
+
+          <div class="flex flex-col items-center p-3 rounded-xl badge-unlocked bg-macaron-green border-2 border-green-300">
+            <div class="w-16 h-16 bg-green-400 rounded-full flex items-center justify-center text-4xl text-white shadow-md">
+              🌱
+            </div>
+            <p class="text-sm font-bold text-slate-700 mt-2 text-center">
+              环保小卫士
+            </p>
+            <p class="text-xs text-slate-500">已获得</p>
+          </div>
+
+          <div class="flex flex-col items-center p-3 rounded-xl bg-gray-100 opacity-60 cursor-not-allowed">
+            <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-4xl text-white shadow-inner">
+              ❓
+            </div>
+            <p class="text-sm font-bold text-slate-500 mt-2 text-center">
+              阅读大咖
+            </p>
+            <p class="text-xs text-slate-400">阅读 20 小时</p>
+          </div>
+
+          <div class="flex flex-col items-center p-3 rounded-xl bg-gray-100 opacity-60 cursor-not-allowed">
+            <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-4xl text-white shadow-inner">
+              🔒
+            </div>
+            <p class="text-sm font-bold text-slate-500 mt-2 text-center">
+              错题终结者
+            </p>
+            <p class="text-xs text-slate-400">完成 50 次错题</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 学习足迹 -->
+      <section>
+        <h2 class="text-2xl font-bold text-slate-800 mb-5 flex items-center gap-2">
+          <i class="ri-walk-fill text-blue-500"></i>
+          我的学习足迹
+        </h2>
+        <div class="bg-white p-6 rounded-3xl shadow-soft space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4 border-blue-50">
+            <div class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold">
+              📚
+            </div>
+            <div class="flex-1">
+              <p class="font-bold">首次完成连续 7 天的学习打卡！</p>
+              <p class="text-sm text-slate-500">
+                成就解锁！你正养成优秀的学习习惯。
+              </p>
+            </div>
+            <span class="text-sm text-slate-400 whitespace-nowrap">
+              2025.10.01
+            </span>
+          </div>
+          <div class="flex flex-col md:flex-row md:items-center gap-4">
+            <div class="w-10 h-10 bg-pink-200 rounded-full flex items-center justify-center text-pink-700 font-bold">
+              ❤️
+            </div>
+            <div class="flex-1">
+              <p class="font-bold">
+                完成首次公益活动“故事伴读计划”！
+              </p>
+              <p class="text-sm text-slate-500">
+                你用声音为他人送去了温暖。
+              </p>
+            </div>
+            <span class="text-sm text-slate-400 whitespace-nowrap">
+              2025.11.15
+            </span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ========= 设置页面 ========= -->
+    <section data-page="settings" class="page-section hidden max-w-5xl mx-auto w-full px-8 pb-28 pt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- 账户与安全 -->
+      <section>
+        <h2 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <i class="ri-user-settings-fill text-blue-500"></i>
+          账户与安全
+        </h2>
+
+        <div class="bg-white rounded-3xl p-6 shadow-soft space-y-4">
+          <a href="javascript:void(0)" class="flex justify-between items-center py-2 hover:bg-blue-50/50 transition rounded-lg px-2 -mx-2">
+            <div class="flex items-center gap-3">
+              <i class="ri-account-circle-fill text-2xl text-blue-400"></i>
+              <div>
+                <p class="font-bold">修改资料/昵称</p>
+                <p class="text-sm text-slate-500">当前昵称：☁️</p>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line text-xl text-slate-400"></i>
+          </a>
+
+          <a href="javascript:void(0)" class="flex justify-between items-center py-2 hover:bg-blue-50/50 transition rounded-lg px-2 -mx-2 border-t pt-4 border-slate-50/50">
+            <div class="flex items-center gap-3">
+              <i class="ri-shield-fill text-2xl text-green-400"></i>
+              <div>
+                <p class="font-bold">家长授权码</p>
+                <p class="text-sm text-slate-500">用于家长端绑定和管理</p>
+              </div>
+            </div>
+            <button class="bg-green-400 text-white px-4 py-1.5 rounded-full text-sm font-bold hover:bg-green-500">
+              查看
+            </button>
+          </a>
+        </div>
+      </section>
+
+      <!-- 学习偏好 -->
+      <section>
+        <h2 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <i class="ri-book-mark-fill text-purple-500"></i>
+          学习偏好
+        </h2>
+
+        <div class="bg-white rounded-3xl p-6 shadow-soft space-y-4">
+          <div class="flex justify-between items-center py-2">
+            <div class="flex items-center gap-3">
+              <i class="ri-eye-fill text-2xl text-purple-400"></i>
+              <div>
+                <p class="font-bold">护眼模式</p>
+                <p class="text-sm text-slate-500">开启后界面将调整为暖色</p>
+              </div>
+            </div>
+            <div id="eye-mode-toggle" class="toggle-switch on" onclick="toggleSetting('eye-mode-toggle','eyeMode')">
+              <div class="toggle-switch-dot"></div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center py-2 border-t pt-4 border-slate-50/50">
+            <div class="flex items-center gap-3">
+              <i class="ri-notification-3-fill text-2xl text-pink-400"></i>
+              <div>
+                <p class="font-bold">学习进度提醒</p>
+                <p class="text-sm text-slate-500">每天发送一次作业提醒</p>
+              </div>
+            </div>
+            <div id="reminder-toggle" class="toggle-switch off" onclick="toggleSetting('reminder-toggle','reminder')">
+              <div class="toggle-switch-dot"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 家长与帮助 -->
+      <section class="col-span-1 md:col-span-2">
+        <h2 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <i class="ri-parent-fill text-orange-500"></i>
+          家长与帮助
+        </h2>
+        <div class="bg-white rounded-3xl p-6 shadow-soft grid grid-cols-1 md:grid-cols-3 gap-6">
+          <a href="javascript:void(0)" class="flex flex-col items-center p-4 bg-macaron-yellow rounded-2xl hover:bg-yellow-100 transition">
+            <i class="ri-question-mark-circle-fill text-3xl text-yellow-500"></i>
+            <p class="font-bold mt-1">常见问题 (FAQ)</p>
+          </a>
+
+          <a href="javascript:void(0)" class="flex flex-col items-center p-4 bg-macaron-green rounded-2xl hover:bg-green-100 transition">
+            <i class="ri-customer-service-2-fill text-3xl text-green-500"></i>
+            <p class="font-bold mt-1">联系我们</p>
+          </a>
+
+          <button class="flex flex-col items-center p-4 bg-red-100 rounded-2xl hover:bg-red-200 transition text-red-600">
+            <i class="ri-logout-box-r-fill text-3xl"></i>
+            <p class="font-bold mt-1">退出登录</p>
+          </button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="app-toast" class="hidden opacity-0 fixed bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-800/90 text-white text-xs md:text-sm rounded-full shadow-lg z-50 transition-opacity"></div>
+
+
+  <!-- ========== 底部 7 个图标导航 ========== -->
+  <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-white/50 shadow-xl rounded-full px-2 py-2 z-50 flex items-center gap-1">
+    <button type="button" data-nav="home" class="nav-item nav-active" onclick="switchPage('home')">
+      <i class="ri-home-smile-2-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">首页</span>
+    </button>
+
+    <button type="button" data-nav="homework" class="nav-item" onclick="switchPage('homework')">
+      <i class="ri-book-open-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">作业</span>
+    </button>
+
+    <button type="button" data-nav="courses" class="nav-item" onclick="switchPage('courses')">
+      <i class="ri-macbook-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">课程</span>
+    </button>
+
+    <button type="button" data-nav="activities" class="nav-item" onclick="switchPage('activities')">
+      <i class="ri-plant-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">公益</span>
+    </button>
+
+    <button type="button" data-nav="messages" class="nav-item relative" onclick="switchPage('messages')">
+      <div id="nav-message-dot" class="absolute top-3 right-4 w-2 h-2 bg-red-400 rounded-full"></div>
+      <i class="ri-message-3-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">消息</span>
+    </button>
+
+    <button type="button" data-nav="growth" class="nav-item" onclick="switchPage('growth')">
+      <i class="ri-trophy-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">成长</span>
+    </button>
+
+    <button type="button" data-nav="settings" class="nav-item" onclick="switchPage('settings')">
+      <i class="ri-settings-4-fill text-2xl mb-0.5"></i>
+      <span class="text-[10px]">设置</span>
+    </button>
+  </nav>
+
+  <!-- 主逻辑脚本 -->
+  <script src="assets/js/app.js"></script>
+
+
+</body></html>
