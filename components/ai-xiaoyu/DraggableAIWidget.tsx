@@ -122,7 +122,7 @@ export default function DraggableAIWidget() {
         }}
       >
         <motion.div
-          className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full shadow-lg cursor-pointer flex items-center justify-center select-none"
+          className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 shadow-lg cursor-pointer flex items-center justify-center select-none rounded-2xl"
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
           onClick={toggleWidget}

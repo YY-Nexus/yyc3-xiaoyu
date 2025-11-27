@@ -111,8 +111,7 @@ export default function HomePage() {
 
             <div className="mt-4 text-center">
               <h2 className="text-2xl font-rounded font-bold text-slate-700">快乐学习助手</h2>
-              <p className="text-slate-500 mt-1">公益 · 陪伴 · 成长</p>
-            </div>
+              <p className="text-slate-500 mt-1">万象归元于云枢            </div>
           </motion.section>
 
           {/* 右侧功能区 */}
@@ -182,7 +181,7 @@ function DailyPlanCard() {
 
   return (
     <motion.div
-      className="bg-macaron-yellow w-full p-6 rounded-3xl shadow-sm flex flex-col gap-3 relative overflow-hidden"
+      className="bg-macaron-yellow w-full p-6 rounded-3xl shadow-sm flex flex-col gap-3 relative overflow-hidden bg-[rgba(255,255,255,1)]"
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >
@@ -238,7 +237,7 @@ function HomeworkCenterCard({ childName }: { childName?: string }) {
 
       <Link href="/homework">
         <motion.button
-          className="group relative bg-gradient-to-r from-orange-300 to-orange-400 hover:from-orange-400 hover:to-orange-500 text-white px-8 md:px-10 py-4 md:py-5 rounded-full shadow-glow transition-all flex items-center gap-3"
+          className="group relative bg-gradient-to-r from-orange-300 to-orange-400 hover:from-orange-400 hover:to-orange-500 text-white px-8 md:px-10 py-4 md:py-5 shadow-glow transition-all flex items-center gap-3 rounded-2xl"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -275,7 +274,7 @@ function FeatureCard({
         whileTap={{ scale: 0.95 }}
       >
         <motion.div
-          className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm"
+          className="w-12 h-12 bg-white flex items-center justify-center shadow-sm rounded-xl"
           whileHover={{ rotate: 360 }}
           transition={{ duration: 0.6 }}
         >

@@ -19,7 +19,7 @@ export default function Navigation() {
 
   return (
     <motion.nav
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-white/50 shadow-xl rounded-full px-2 py-2 z-40 flex items-center gap-1"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-white/50 shadow-xl py-2 z-40 flex items-center gap-1 rounded-2xl px-4"
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.4 }}
@@ -30,7 +30,7 @@ export default function Navigation() {
         return (
           <Link key={item.id} href={item.href}>
             <motion.button
-              className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-full transition-all ${
+              className={`relative flex flex-col items-center justify-center py-2 transition-all px-5 rounded-xl ${
                 isActive ? "bg-blue-400 text-white" : "text-slate-600 hover:bg-slate-100"
               }`}
               whileHover={{ scale: 1.1 }}

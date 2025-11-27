@@ -48,7 +48,7 @@ export default function HomeHeader() {
         </div>
 
         <motion.div
-          className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-2xl backdrop-blur-sm"
+          className="flex items-center gap-2 bg-white/60 px-4 py-2 backdrop-blur-sm rounded-md"
           whileHover={{ scale: 1.05 }}
         >
           <motion.i
@@ -104,12 +104,12 @@ function QuickActionButton({
   return (
     <Link href={href}>
       <motion.button
-        className={`flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm transition cursor-pointer text-slate-600 ${hoverColor}`}
+        className={`flex items-center gap-2 bg-white px-4 py-2 shadow-sm transition cursor-pointer text-slate-600 rounded-md ${hoverColor}`}
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.95 }}
       >
         <i className={`${icon} ${iconColor}`} />
-        <span className="text-sm font-bold">{label}</span>
+        <span className="text-sm font-black">{label}</span>
       </motion.button>
     </Link>
   )
