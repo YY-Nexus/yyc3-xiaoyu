@@ -252,9 +252,9 @@ MIT License
 
 ## 联系方式
 
-- 项目主页: [https://xy.mymgmt.top]
-- 技术支持: admin@0379.email
-- 反馈建议: admin@0379.email
+- 项目主页: [https://yyc3.app](https://yyc3.app)
+- 技术支持: support@yyc3.app
+- 反馈建议: feedback@yyc3.app
 
 ## 致谢
 

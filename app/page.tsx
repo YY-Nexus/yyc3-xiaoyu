@@ -111,7 +111,8 @@ export default function HomePage() {
 
             <div className="mt-4 text-center">
               <h2 className="text-2xl font-rounded font-bold text-slate-700">快乐学习助手</h2>
-              <p className="text-slate-500 mt-1">万象归元于云枢            </div>
+              <p className="text-slate-500 mt-1">万象归元于云枢</p>
+            </div>
           </motion.section>
 
           {/* 右侧功能区 */}
