@@ -370,10 +370,15 @@ export class GrowthStageManager {
   }
 }
 
-// 单例实例
 let stageManagerInstance: GrowthStageManager | null = null
 
 export function getGrowthStageManager(): GrowthStageManager {
+  // 在服务器端每次返回新实例，避免SSR问题
+  if (typeof window === "undefined") {
+    return new GrowthStageManager()
+  }
+
+  // 客户端使用单例
   if (!stageManagerInstance) {
     stageManagerInstance = new GrowthStageManager()
   }
